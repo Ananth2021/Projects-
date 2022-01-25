@@ -1,0 +1,284 @@
+---
+title: "Machine Learning Final Project - Credit Card Defaulters Prediction"
+author: "S.S.Ananth Kumar"
+date: "10/11/2021"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+    math: katex
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,message=FALSE,warning = FALSE)
+```
+.libPaths("C:\\Users\\Ananth\\OneDrive\\Desktop\\MSBA Kent\\Fall 2021\\Fundamentals of Machine Learning\\Assignment\\Ass 2 ")
+
+
+```{r}
+library(dplyr) # for data manipulation
+library(stringr) # for data manipulation
+library(caret) # for sampling
+library(caTools) # for train/test split
+library(ggplot2) # for data visualization
+library(corrplot) # for correlations
+library(Rtsne) # for tsne plotting
+library(rpart)# for decision tree model
+library(imbalance) # for imbalance data set 
+
+```
+
+```{r}
+# Load data
+data <- read.csv("application_data.csv")
+head(data)
+
+str(data)
+# checjing for missing values across the data frame 
+apply(data, 2, function(x) sum(is.na(x)))
+
+#substituting blank values with na values 
+data[data==""] <- NA
+
+#for the sake of computation capacity only 10000 rows are subsetted 
+data= data[1:10000,]
+
+# checking head of the data
+head(data)
+# checking tale of the data 
+tail(data)
+
+
+
+```
+
+
+
+```{r}
+#summary of data
+summary(data)
+```
+
+```{r}
+# checking missing values
+colSums(is.na(data))
+```
+
+```{r}
+# checking target imbalance
+table(data$TARGET)
+```
+
+
+```{r}
+# target imbalance in percentage
+prop.table(table(data$TARGET))
+```
+
+```{r fig.width = 10, fig.height = 4}
+# plot the graph between farud and not fraud
+common_theme <- theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
+ggplot(data = data, aes(x = factor(TARGET), 
+                          y = prop.table(stat(count)), fill = factor(TARGET),
+                          label = scales::percent(prop.table(stat(count))))) +
+    geom_bar(position = "dodge") + 
+    geom_text(stat = 'count',
+              position = position_dodge(.9), 
+              vjust = -0.5, 
+              size = 3) + 
+    scale_x_discrete(labels = c("no fraud", "fraud"))+
+    scale_y_continuous(labels = scales::percent)+
+    labs(x = 'TARGET', y = 'Percentage') +
+    ggtitle("Distribution of target labels") +
+    common_theme
+    
+```
+
+
+```{r fig.width = 10, fig.height = 4}
+#Distribution of transaction amount by taget
+ggplot(data, aes(x = factor(TARGET), y = AMT_INCOME_TOTAL)) + geom_boxplot() + 
+labs(x = 'TARGET', y = 'AMT_INCOME_TOTAL') +
+ggtitle("Distribution of transaction amount by taget") + common_theme
+```
+
+```{r}
+#data preprocessing
+
+# Removing unwanted columns
+final<-data %>% select(TARGET,NAME_CONTRACT_TYPE,CNT_CHILDREN,AMT_INCOME_TOTAL,AMT_CREDIT,AMT_ANNUITY,AMT_GOODS_PRICE,NAME_TYPE_SUITE,NAME_INCOME_TYPE,TARGET,NAME_CONTRACT_TYPE,CNT_CHILDREN,AMT_INCOME_TOTAL,AMT_CREDIT,AMT_ANNUITY,AMT_ANNUITY,NAME_TYPE_SUITE,NAME_INCOME_TYPE,NAME_EDUCATION_TYPE,NAME_FAMILY_STATUS,DAYS_EMPLOYED,OCCUPATION_TYPE)
+
+str(final)
+
+```
+
+```{r}
+#finding null values in final dataset
+apply(final, 2, function(x) sum(is.na(x)))
+# replacing missing values with the mean value of the column.
+final$AMT_GOODS_PRICE[which(is.na(final$AMT_GOODS_PRICE))] = mean(final$AMT_GOODS_PRICE,na.rm=T)
+final$AMT_ANNUITY[which(is.na(final$AMT_ANNUITY))] = mean(final$AMT_ANNUITY,na.rm=T)
+```
+
+```{r}
+library(superml)
+library(caret)
+library(corrplot)
+
+#label encoding for categorical column
+label <- LabelEncoder$new()
+final$NAME_CONTRACT_TYPE <- label$fit_transform(final$NAME_CONTRACT_TYPE)
+final$NAME_TYPE_SUITE <- label$fit_transform(final$NAME_TYPE_SUITE)
+final$NAME_INCOME_TYPE <- label$fit_transform(final$NAME_INCOME_TYPE)
+final$NAME_EDUCATION_TYPE <- label$fit_transform(final$NAME_EDUCATION_TYPE)
+final$NAME_FAMILY_STATUS <- label$fit_transform(final$NAME_FAMILY_STATUS)
+final$OCCUPATION_TYPE <- label$fit_transform(final$OCCUPATION_TYPE)
+
+#ploting correlation matrix with final dataset
+#Converting the TARGET variable as factors
+final$TARGET <- as.factor(final$TARGET)
+
+
+#splitting the data into train and test
+# Splitting data into train
+# and test data
+
+split <- sample.split(final, SplitRatio = 0.8)
+train_cl <- subset(final, split == "TRUE")
+test_cl <- subset(final, split == "FALSE")
+
+#testing for target variable proportionality 
+table(test_cl$TARGET)
+
+prop=table(test_cl$TARGET)
+
+barplot(prop)
+
+```
+```{r}
+set.seed(10000)
+#Oversampling where the minority class will be increased to the level of majority class
+
+OT <- upSample(x=train_cl[, -ncol(train_cl)],y = train_cl$TARGET)
+
+
+OT = OT[,-c(1)]
+
+
+#fitOT = rpart(TARGET ~ ., data = OT)
+
+#OTprd = predict(fitOT,newdata =train_cl)
+
+#roc.curve(train_cl$TARGET,OTprd[,2],plotit = F)
+
+```
+
+
+```{r}
+# Installing Packages
+#install.packages("e1071")
+#apply navie bayes algorithm
+library(e1071)
+library(caret)
+
+#error metrics -- Confusion Matrix
+ 
+error_metric=function(CM)
+{
+  TN =CM[1,1]
+  TP =CM[2,2]
+  FP =CM[1,2]
+  FN =CM[2,1]
+  precision =(TP)/(TP+FP)
+  Recall=(TP)/(TP+FN)
+  F1_score=2*(precision*Recall)/(precision+Recall)
+  accuracy_model  =(TP+TN)/(TP+TN+FP+FN)
+  print(paste("Precision value of the model: ",(precision)))
+  print(paste("Accuracy of the model: ",(accuracy_model)))
+  print(paste("Recall of the model: ",(Recall)))
+  print(paste("F1 score of the model: ",(F1_score)))
+   
+}
+
+# Fitting Naive Bayes Model
+# to training dataset
+set.seed(120)  # Setting Seed
+classifier_cl <- naiveBayes(Class ~ ., data = OT)
+classifier_cl
+
+
+# Predicting on test data'
+y_pred <- predict(classifier_cl, newdata = test_cl)
+
+y_pred
+
+# Confusion Matrix
+cm <- table(test_cl$TARGET, y_pred)
+cm
+
+# Model Evaluation
+confusionMatrix(cm)
+
+#print precesion and accuracy of model
+error_metric(cm)
+```
+
+```{r}
+# Loading package
+library(caTools)
+library(ROCR) 
+
+
+# Training model
+logistic_model <- glm(Class ~., 
+                      data = OT, 
+                      family = "binomial")
+logistic_model
+   
+# Summary
+summary(logistic_model)
+   
+# Predict test data based on model
+predict_reg <- predict(logistic_model, test_cl, type = "response")
+
+# Changing probabilities
+predict_reg <- ifelse(predict_reg >0.5, 1, 0)
+   
+# Evaluating model accuracy
+# using confusion matrix
+table(test_cl$TARGET, predict_reg)
+   
+missing_classerr <- mean(predict_reg != test_cl$TARGET)
+print(paste('Accuracy =', 1 - missing_classerr))
+   
+# ROC-AUC Curve
+ROCPred <- prediction(predict_reg, test_cl$TARGET) 
+ROCPer <- performance(ROCPred, measure = "tpr", 
+                             x.measure = "fpr")
+   
+auc <- performance(ROCPred, measure = "auc")
+auc <- auc@y.values[[1]]
+auc
+   
+# Plotting curve
+plot(ROCPer)
+plot(ROCPer, colorize = TRUE, 
+     print.cutoffs.at = seq(0.1, by = 0.1), 
+     main = "ROC CURVE")
+abline(a = 0, b = 1)
+   
+auc <- round(auc, 4)
+legend(.6, .4, auc, title = "AUC", cex = 1)
+
+
+# Predicting on test data'
+y_pred <- predict(classifier_cl, newdata = test_cl)
+y_pred
+
+plot(y_pred)
+
+```
+
