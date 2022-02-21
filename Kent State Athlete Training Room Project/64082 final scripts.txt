@@ -1,0 +1,168 @@
+
+// Creating collections
+// NOTE: These aren't actually comments, do not copy "comments"
+db.createCollection("STUDENT_ATHLETE")
+db.createCollection("STAFF")
+db.createCollection("EQUIPMENT")
+
+// Adding myself, and pretending I play baseball
+db.STUDENT_ATHLETE.insertOne({
+	fname: "Ryan",
+	lname: "McGuinness",
+	KSU_ID: "01234",
+	email: "rmcguinn",
+	phone: "3308082724",
+	DoB: new Date("1998-07-22"),
+	sport: "Baseball",
+	major: "BusinessAnalytics",
+	position: "2B",
+	Height: "5\' 11\"",
+	Weight: "165 lbs"
+})
+
+// Updating my student_athlete record to include medical record
+// $set operator will insert a field or update an existing field
+db.STUDENT_ATHLETE.updateOne({KSU_ID: "01234"}, {
+	$set: {
+	medical_record: {
+		condititions: [
+			{eyes: {
+				last_exam: new Date("2021-06-02"),
+				prescription_type: "single",
+				prescription: {
+					OD_SPH: 1.25,
+					OD_CYL: -0.5,
+					OD_Axis: 180,
+					OS_SPH: -0.75,
+					OS_CYL: -0.75,
+					OS_Axis: 168
+				}
+			}}
+		],
+		injuries: [],
+		medications: []
+	}}
+})
+
+// Adding athletes who are totally, definitely students
+db.STUDENT_ATHLETE.insertMany(
+	[{
+	fname: "Baker",
+	lname: "Mayfield",
+	KSU_ID: "6",
+	sport: "Football",
+	position: "QB",
+	medical_record: {
+		conditions: [],
+		injuries: [],
+		medications: []
+	}
+	},
+	{
+	fname: "Jose",
+	lname: "Ramirez",
+	KSU_ID: "11",
+	sport: "Baseball",
+	position: "3B",
+	medical_record: {
+		conditions: [],
+		injuries: [],
+		medications: []
+	}
+	}]
+)
+
+// Uh-oh, Baker tore his labrum
+db.STUDENT_ATHLETE.updateOne({KSU_ID: "6"}, {
+	$push: {"medical_record.injuries": {
+		date: new Date("2021-09-19"),
+		location: "shoulder",
+		nature: "partially torn labrum"
+	}}
+})
+
+// Inserting some KSU training staff
+db.STAFF.insertOne({
+	fname: "Trent",
+	lname: "Stratton",
+	position: "Associate Athletic Director for Sports Medicine, Sports Performance and Student-Athlete Well-Being",
+	sports: ["Men's Golf", "Women's Golf"]
+})
+
+db.STAFF.insertOne({
+	fname: "Toni",
+	lname: "Bolar",
+	position: "Athletic Trainer",
+	sports: ["Football", "Lacrosse"]
+})
+
+// Adding equipment
+// Honestly don't know too much about this at all
+// Feel absolutely free to expand on some of the fields
+db.EQUIPMENT.insertOne({
+	type: "thermo",
+	reservations: [
+		{
+		begin: new Date("2021-12-07T12:30:00"),
+		end: new Date("2021-12-07T13:00:00"),
+		KSU_ID: "01234"
+		}
+	]
+})
+
+db.EQUIPMENT.insertMany([
+	{
+	type: "compression",
+	reservations: []
+	}, 
+	{
+	type: "e-stim",
+	reservations: []
+	}
+])
+
+// OTHER IMPORTANT QUERIES
+
+// viewing student-athlete stats
+db.STUDENT_ATHLETE.find({KSU_ID: "01234"})
+
+//viewing medical record only of an athlete
+db.STUDENT_ATHLETE.find({KSU_ID: "6"}, {fname:1, lname:1, medical_record: 1})
+
+// Reserving equipment
+// $push operator adds element to specified array
+db.EQUIPMENT.updateOne({type: "compression"}, {
+	$push: {reservations: {
+		begin: new Date("2021-12-02"), 
+		end: new Date("2021-12-03"), 
+		KSU_ID: "6"
+	}}
+})
+
+// find equipment with upcoming reservations
+db.EQUIPMENT.find({
+	"reservations.end": {$gt: new Date()}
+})
+
+// find equipment reserved by specified athlete
+db.EQUIPMENT.find({
+	"reservations.KSU_ID": "01234"
+})
+
+// remove all passed equipment reservations
+// $pull operator removes all elements from array with matched criteria
+db.EQUIPMENT.updateMany({}, {
+	$pull: {
+		reservations: {end: {$lt: new Date()}}
+	}
+})
+
+// find equipment reserved now
+db.EQUIPMENT.find({
+	reservations: { $elemMatch: {
+		begin: {$lte: new Date()},
+		end: {$gte: new Date()}
+	}}
+})
+
+

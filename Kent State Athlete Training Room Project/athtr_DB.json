@@ -1,0 +1,144 @@
+use athtr
+
+db.sAthlete.insertOne({
+	ksuId: 12345678, 
+	firstName: "John", 
+	lastName: "Doe", 
+	preferredName: "some name", 
+	dateOfBirth: new Date("10/16/1998"),
+	email: "john@example.com", 
+	phone: [
+		{
+			tags: ["cell"],
+			number: "216123xxxx"
+		}
+	], 
+	Eligibility: true,
+	Major: ["Economics", "Accounting"], 
+	sport: ["Soccer", "Chess"], 
+	position: ["Midfield", "NA"], 
+	height: 185, 
+	weight: 90, 
+	personalStat: ["20 assists", "6 goals"], 
+	staff: ObjectId("61ac086eba7231f278806c12")
+})
+
+
+db.staff.insertOne({
+	ksuId:87654321, 
+	firstName: "Jane", 
+	lastName: "Doe",
+	position: ["Coach"], 
+	email: "jane@example.com", 
+	phone: [
+		{
+			tags: ["office"], 
+			number: "440123xxxx"
+		}
+	], 
+	sport: ["Track and Field"]
+})
+
+db.equipment.insertOne({
+	eType: "Cold Therapy", 
+	reservationState: "R", 
+	dateReserved: new Date("11/28/1970"),
+	duration: 2, 
+	reservedBy: ObjectId("61ac2e9cba7231f278806c16")
+}) 
+
+
+
+db.staff.insertMany([{ksuId: "87654322", firstName: "Sam", lastName: "Johnson", position: "Medical Practitioner", 
+			email: "test@test.com", phone: {tags: "cell", number: "917123xxxx"}, sport: "NA"}, 
+			{ksuId: "87654323", firstName: "Tom", lastName: "Paul", position: "Athletic Trainer", 
+				email: "test2@test.com", phone: {tags: "cell", number: "419123xxxx"}, sport: "Rowing"}])
+
+
+db.sAthlete.insertMany([{ksuId: "11145678", firstName: "Alex", lastName: "Thomas", preferredName: "some name", 
+	dateOfBirth: new Date("11/16/2000"), email: "alex@example.com", 
+	phone: {tags: "cell", number: "917123xxxx"}, Eligibility: true, Major: ["Biology"], 
+	sport: ["Basketball"], position: ["Power Forward"], height: NumberInt("197"), weight: NumberInt("100"), 
+	personalStat: ["10 assists", "15 baskets", "11 rebounds"], staff: ObjectId("61ac240fba7231f278806c14")}, 
+	     
+	  {ksuId: "22245678", firstName: "Maria", lastName: "Gomez", preferredName: "some name", 
+		dateOfBirth: new Date("1/22/2003"), email: "maria@example.com", 
+		phone: {tags: "cell", number: "919123xxxx"}, Eligibility: true, Major: ["Mechanical Engineering"], 
+		sport: ["100m sprint"], position: ["NA"], height: NumberInt("173"), weight: NumberInt("65"), 
+		personalStat: ["12.2 sec"], staff: ObjectId("61ac240fba7231f278806c15")}])
+
+
+db.medRecord.insertOne({
+	referenceNumber: "k000001", 
+	baselineAnatomy:[
+		{
+			anatomicalRegion: ["Head"], 
+			detailedDescription: "Add a detailed note on findings about the baseline"
+		}
+	], 
+	diagnosticTestsPerformed: ["MRI"], 
+	prescriptionMedications:[
+		{
+			medicationName: "some medication", dosage: "3mg daily", 
+			purpose: "to treat some condition", since: new Date("11/28/2020")
+		}
+	],
+	supplement_ergogenic_aids:[
+		{
+			medicationName: "some supplement", dosage: "3mg daily", 
+			purpose: "to treat some condition", since: new Date("11/28/2020")
+		}
+	],
+	medicalConditions: [
+		{
+			heatRelated: 
+				{
+					type: ["Cramps","Syncope", "Exhaustion", "Stroke"], 
+					latestIncidentDate: new Date("12/02/2021")
+				},
+			allergies: 
+				{
+					type: ["penicilin injections"], description: "some description here"
+				},
+			asthma:
+			{
+				exerciseInducedIncidents: "describe here", inhailerUse: "detail here" 
+			},
+			diabetes: 
+			{
+				type: "type2", medication: "description here"
+			},
+				
+			eyes:
+			{
+				lastEyeExam: new Date("11/11/2019"), findings: "findings here"
+			},
+				
+			cardiovascularRiskFactors:
+			{
+				indicators: ["chest pain"],
+				ekg_echmo_result: "place result here"
+			},
+				
+			sickleCell:
+				{
+					testResult: "write test result here", familyHistory: "write here"
+				}
+			
+		}
+	],
+	athlete: ObjectId("61ac2e9cba7231f278806c16"),
+	injuryRecord: ObjectId("61ac55d1ba7231f278806c19")
+})
+
+
+db.injRecord.insertOne({
+	event: "NCAA Championship", venue: "Rose Bowl", dateOfIncident: new Date("10/14/2021"), 
+	activityAtTimeOfInjury: ["competition"], presentationReason: ["recurrent injury"], 
+	partsInjured: "calf", natureOfInjury: "tear", cause: "bad tackle",
+	contributingFactors: "playing surface", protectiveEquipmentWorn: "Yes", 
+	actionTaken: "ice pack applied", adviseGiven: ["Return to play with restriction"],
+	referral: ["physiotherapist"], severityAssessment: ["Mild"], treatingPerson: "First Responder", 
+	athlete: ObjectId("61ac2e9cba7231f278806c16")
+
+})

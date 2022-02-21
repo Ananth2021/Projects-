@@ -1,0 +1,129 @@
+STUDENT_ATHLETES:
+	- First Name
+	- Last Name
+	- KSU_ID
+	- Preferred Name
+	- Email
+	- Phone #
+	- DoB
+	- Sport
+	- Secondary Sport
+	- Eligibility
+	- Major
+	- Position
+	- Height
+	- Weight
+	- Personal_Best
+============================================================================================
+
+STAFF: 
+	- First Name
+	- Last Name
+	- KSU_ID
+	- Position [Medical Practitioner, Coach, Athletic Trainers, Graduate Assistant Trainers, 
+					Outside partners]
+	- Email
+	- Phone #
+============================================================================================
+
+EQUIPMENT: 
+	- Equipment Type [Cold Therapy, Thermotherapy, E-stim/EMS, Intermittent compression]
+	- Reservation State
+	- DateTime Reserved
+	- Duration
+    
+
+============================================================================================
+
+MEDICAL RECORD: 
+	- First Name 
+	- Last Name
+	- KSU_ID
+	- Sport
+	- Height
+	- Weight 
+	- Family History
+		- Father's 
+		- Mother's
+	- Anatomy[Head, Cervical Spine/Neck, Shoulder/Upper Arm, Elbow/Forearm,
+				Wrist/Hand/Fingers, Spine/Low Back/Sacroiliac Joint, Knee/Patella, 
+				Ankle/Lower Leg, Foot/Toes, Ribs/Thorax Chest, Dermatological, 
+				Abdomen]
+			- Past_Injury[Y,N]
+			- Dates
+			- Description
+			- Diagnostic Tests performed [MRI, CT-Scan,Neuropsychological, X-Ray, Bone Scan,]
+	- Prescription Medications
+		- Medication Name
+		- Dosage
+		- Purpose
+		- Dates
+	-Supplements/Ergogenic Aids
+		- Supplement Name
+		- Dosage
+		- Purpose
+		- Dates
+	-Medical Conditions:
+		- Heat Related Problems [Cramps, Syncope, Exhaustion, Stroke]
+			- Incedent dates
+		- Allergies
+			- Types
+			- Description
+		- Asthma 
+			- Exercise induced incidents
+			- Inhailer use
+			- Description
+		- Diabetes
+			- Type
+			- Medication
+		- Eyes 
+			-Last Eye Exam
+			-Findings
+		- Cardiovascular Risk Factors[chest pain,shortness of breath,dizzyness, skipping beats, heart racing,
+										heart murmur, family history]
+				- EKG/ECHO result
+		- Sickle Cell Anemia/Trait
+				- Test result
+				- Family history
+==============================================================================================
+INJURY RECORD
+	- First Name 
+	- Last Name
+	- KSU_ID
+	- DoB
+	- Sport
+	- Event
+	- Venue
+	- TimeDate of incident
+	- Type of Activity at Time of Injury [training, warm-up, competition, cool-down, Other]
+	- Reason for Presentation [new Injury, aggravated injuryy, recurrent injury, illness, other]
+	- Body Parts Injured
+	- Nature of Injury/Illness[bruise/contusion, cardiac, cold/flu, dislocation/subluxation, fracture,
+								inflammation/swelling, loss of consciousness,..., other]
+	- Cause of Injury
+	- Contributing factors [unsuitable footwear, playing surface, equipment, foul play]
+	- Protective Equipment Worn [Yes, No, TypeOf]
+	- Action Taken [none, CPR, Dressing, Immobilization,...other]
+	-Advise Given
+			- Return to activity
+			- Return to play with restriction
+			- Unable to return at present
+			- Referred for further assessment before returning to activity
+	- Referral 
+		- No referral
+		- Medical practitioner
+		- physiotherapist
+		- ambulance
+		- hospital
+		- other
+	- Provisional Severity Assessment
+		- Mild (1-7 days modified activity)
+		- Moderate (8-21 days modified activity)
+		- Severe (>21 days modified or lost)
+
+	- Treating Person
+		- Sports Trainer/First Responder ID
+		- Medical Practitioner
+		- Physiotherapist 
+		- Other
+
